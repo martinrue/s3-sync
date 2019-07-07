@@ -11,37 +11,73 @@ Run `make build` to build the binary.
 Run `dist/sync` to sync files to a bucket.
 
 ```
-→ ./dist/sync
-S3 Sync Tool
-
-Usage:
-  sync --dir=<directory> --bucket=<bucket>
+→ dist/sync
+usage: sync --dir=<directory> --bucket=<bucket> --region=<region> --ext=<extensions> --silent
 ```
 
-## Input
+## Flags
 
-Files in the specified directory should be named as a space-separated list of tags, which will be used in the final output file (see below). Example:
+### `--dir`
+
+Specifies the directory of files to synchronise.
+
+Filenames must consist of a space-separated list of tags. Example: `--dir=data`
 
 ```
-<directory>/house home garden 1.svg
-<directory>/car automobile drive 2.svg
-<directory>/man woman person 3.svg
+<data>/house home garden 1.svg
+<data>/car automobile drive 2.svg
+<data>/man woman person 3.svg
 ```
 
-Each file will be uploaded to the bucket as a content-addressable key, which will be linked against the respective tags in the JSON output file. Numbers in file names are ignored.
+Each file will be uploaded to the bucket under a content-addressable key, which will be linked against its respective tags in the final JSON output.
 
-## Output
+Note: numbers in filename are ignored.
 
-On completion, the tool will write a JSON file that links all keys currently in the S3 bucket to the associated tags. Example:
+### `--bucket`
 
-```json
-[
-  { "key": "5d41402abc...", "tags": "house home garden" },
-  { "key": "ae2b1fca51...", "tags": "car automobile drive" },
-  { "key": "6057f13c49...", "tags": "man woman person" }
-]
-```
+Specifies the name of the S3 bucket in which to store objects.
+
+Note: before running `sync`, ensure you have an AWS profile that allows read and write access to the bucket .
+
+### `--region`
+
+Sets the AWS region for the bucket. If this flag isn't provided, the default value is `eu-west-1`.
+
+### `--ext`
+
+A comma-separated list of extensions used to filter files in `--dir`. If specified, only files with a matching extension will be processed. Example: `--ext=png,svg`
+
+### `--silent`
+
+Silences all progress output of `sync`.
 
 ## Diffing
 
-The tool also uploads the JSON document to the bucket, using it on subsequent runs to avoid doing unnecessary work.
+On completion, `sync` will write an `index.json` object to the bucket, which it will use on subsequent runs to avoid doing unnecessary work.
+
+## Output
+
+Once `sync` completes, it'll output a JSON document to `stdout` that tracks all CAS keys in the bucket against their respective tags.
+
+Example:
+
+```
+→ sync --dir=icons --ext=svg --bucket=icons
+uploading: f693691218...
+uploading: db99ed52a2...
+uploading: 27dd8ed44a...
+processed 3 objects
+uploaded 3 objects
+
+[
+  { "key": "f693691218...", "tags": "house home garden" },
+  { "key": "db99ed52a2...", "tags": "car automobile drive" },
+  { "key": "27dd8ed44a...", "tags": "man woman person" }
+]
+```
+
+Note: redirect `stdout` to a file to capture only the JSON output. Example:
+
+```
+→ sync --dir=icons --ext=svg --bucket=icons > index.json
+```
