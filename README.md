@@ -1,5 +1,7 @@
 # S3 CAS File Sync
 
+[![CircleCI](https://circleci.com/gh/martinrue/s3-sync.svg?style=svg)](https://circleci.com/gh/martinrue/s3-sync)
+
 A tool to sync tagged files to an S3 bucket using content-addressable storage ([CAS](https://en.wikipedia.org/wiki/Content-addressable_storage)).
 
 ## Building
