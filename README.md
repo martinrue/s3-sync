@@ -26,9 +26,9 @@ Specifies the directory of files to synchronise.
 Filenames must consist of a space-separated list of tags. Example: `--dir=data`
 
 ```
-<data>/house home garden 1.svg
-<data>/car automobile drive 2.svg
-<data>/man woman person 3.svg
+data/house home garden 1.svg
+data/car automobile drive 2.svg
+data/man woman person 3.svg
 ```
 
 Each file will be uploaded to the bucket under a content-addressable key, which will be linked against its respective tags in the final JSON output.
